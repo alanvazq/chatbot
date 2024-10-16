@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-  final String repoUrl = "https://github.com/203422";
+  final String repoUrl = "https://github.com/203460";
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +43,12 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 10),
             
             const Text(
-              'Alan Manuel Gómez Vázquez',
+              'Omar Ceja Sánchez',
               style: TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 10),
             const Text(
-              '203422',
+              '203460',
               style: TextStyle(fontSize: 18),
             ),
            const SizedBox(height: 20),
@@ -63,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                     throw 'No se pudo abrir el enlace $repoUrl';
                   }
                 },
-                child: Text('Ver Repositorio'),
+                child: Text('Repositorio'),
               ),
             ),
           ],

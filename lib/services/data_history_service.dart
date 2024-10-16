@@ -5,8 +5,7 @@ import 'dart:convert';
 
 class DataHistoryService {
 
-
-  Future<void> saveConversation(messages) async {
+  Future<void> saveConversation(List<Message> messages) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> messagesList = messages.map((msg) => jsonEncode({
@@ -22,4 +21,6 @@ class DataHistoryService {
     List<String>? messagesList = prefs.getStringList('conversation');
     return messagesList;
   }
+
+  
 }

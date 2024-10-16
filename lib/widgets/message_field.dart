@@ -3,14 +3,13 @@ import 'package:chatbot/providers/chat_provider.dart';
 import 'package:flutter/material.dart';
 
 class MessageField extends StatelessWidget {
-
-  // final ValueChanged<String> onValue;
-
-  const MessageField({super.key});
+  final bool isConnected;
+  const MessageField({super.key, required this.isConnected});
 
   @override
   Widget build(BuildContext context) {
-    // final colors = Theme.of(context).colorScheme;
+    final colors = Theme.of(context).colorScheme;
+
     final textController = TextEditingController();
     final focusNode = FocusNode();
     final outlineInputBorder = UnderlineInputBorder(
@@ -30,17 +29,19 @@ class MessageField extends StatelessWidget {
         chatProvider.sendMessage(value);
       },
       decoration: InputDecoration(
-        
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorder,
           filled: true,
           suffixIcon: IconButton(
-              onPressed: () {
-                final textValue = textController.value.text;
-                textController.clear();
-                chatProvider.sendMessage(textValue);
-                chatProvider.geminiResponse(textValue);
-              },
+
+              color: colors.primary,
+              onPressed: isConnected
+                  ? () {
+                      final textValue = textController.value.text;
+                      textController.clear();
+                      chatProvider.sendMessage(textValue);
+                    }
+                  : null,
               icon: const Icon(Icons.send))),
     );
   }

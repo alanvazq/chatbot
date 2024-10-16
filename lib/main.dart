@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:provider/provider.dart';
 
-const apiKey = "AIzaSyDHjbUqF2thTON9DUgwa_6ocvBQgq4aL2A";
+const apiKey = "";
 void main() {
   Gemini.init(apiKey: apiKey);
   runApp(const MyApp());
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: '',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
           useMaterial3: true,
         ),
         home: const MainScreen(),

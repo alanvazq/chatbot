@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:chatbot/entities/message.dart';
 import 'package:chatbot/services/data_history_service.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +10,12 @@ class ChatProvider extends ChangeNotifier {
   final DataHistoryService dataHistoryService = DataHistoryService();
 
   List<Message> messageList = [];
+  bool isLoading = true;
 
   Future<void> sendMessage(String text) async {
     if (text.isEmpty) return;
     final newMessage = Message(text: text, fromWho: FromWho.me);
     messageList.add(newMessage);
-
     notifyListeners();
     moveScrollToBottom();
   }
@@ -26,6 +25,7 @@ class ChatProvider extends ChangeNotifier {
     messageList.add(newMessageGemini);
     notifyListeners();
     moveScrollToBottom();
+    await dataHistoryService.saveConversation(messageList);
   }
 
   Future<void> moveScrollToBottom() async {
@@ -45,7 +45,9 @@ class ChatProvider extends ChangeNotifier {
     String accumulatedText = '';
 
     gemini.streamGenerateContent(text).listen((value) {
-      accumulatedText += value.output!;
+      if (value.output != null) {
+        accumulatedText += value.output!;
+      }
     }, onDone: () {
       messageList.remove(tempMessage);
 
@@ -71,7 +73,8 @@ class ChatProvider extends ChangeNotifier {
       }).toList();
 
       messageList = restoredMessages;
-      notifyListeners();
     }
+    isLoading = false;
+    notifyListeners();
   }
 }
