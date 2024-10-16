@@ -1,7 +1,9 @@
+import 'package:chatbot/entities/message.dart';
 import 'package:flutter/material.dart';
 
 class GeminiMessageBubble extends StatelessWidget {
-  const GeminiMessageBubble({super.key});
+  final Message message;
+  const GeminiMessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -12,15 +14,17 @@ class GeminiMessageBubble extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
               color: colors.secondary, borderRadius: BorderRadius.circular(20)),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
-              "Mensaje",
-              style: TextStyle(color: Colors.white),
+              message.text,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ),
-        const SizedBox(height: 10,)
+        const SizedBox(
+          height: 10,
+        )
       ],
     );
   }
