@@ -18,12 +18,13 @@ class ChatScreen extends StatelessWidget {
         leading: const Padding(
           padding: EdgeInsets.all(4.0),
           child: CircleAvatar(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.white,
+            backgroundImage: AssetImage('assets/images/gemini.jpg'),
           ),
         ),
-        title: const Text("Boot IA"),
+        title: const Text("My Chat Bot"),
       ),
-      body: ChatView(),
+      body: const ChatView(),
     );
   }
 }

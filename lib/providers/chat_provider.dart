@@ -18,6 +18,7 @@ class ChatProvider extends ChangeNotifier {
     messageList.add(newMessage);
     notifyListeners();
     moveScrollToBottom();
+    geminiResponse(text);
   }
 
   Future<void> geminiMessage(text) async {
@@ -37,14 +38,16 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> geminiResponse(String text) async {
-    final tempMessage =
-        Message(text: "Escribiendo...", fromWho: FromWho.gemini);
+    final tempMessage = Message(text: "Escribiendo...", fromWho: FromWho.gemini);
     messageList.add(tempMessage);
     notifyListeners();
 
     String accumulatedText = '';
 
-    gemini.streamGenerateContent(text).listen((value) {
+    gemini.streamGenerateContent(text, generationConfig: GenerationConfig(
+            maxOutputTokens: 512,
+            temperature: 0.75,
+          )).listen((value) {
       if (value.output != null) {
         accumulatedText += value.output!;
       }
