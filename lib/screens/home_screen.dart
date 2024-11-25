@@ -34,6 +34,11 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 10),
+             const Text(
+              'Recuperación A1',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 10),
             const Text(
               'Alan Manuel Gómez Vázquez',
               style: TextStyle(fontSize: 18),
@@ -71,3 +76,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+

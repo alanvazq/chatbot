@@ -8,24 +8,34 @@ class GeminiMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-              color: colors.secondary, borderRadius: BorderRadius.circular(20)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              message.text,
-              style: const TextStyle(color: Colors.white),
+    return Column(children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const CircleAvatar(
+            backgroundColor: Colors.transparent,
+            backgroundImage: AssetImage('assets/images/gemini.jpg'),
+            radius: 20,
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                  color: colors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  message.text,
+                  style: TextStyle(color: colors.primary),
+                ),
+              ),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 10,
-        )
-      ],
-    );
+        ],
+      ),
+      SizedBox(height: 10,)
+    ]);
   }
 }

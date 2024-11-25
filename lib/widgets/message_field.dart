@@ -1,48 +1,79 @@
-import 'package:provider/provider.dart';
 import 'package:chatbot/providers/chat_provider.dart';
+import 'package:chatbot/screens/qr_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
-class MessageField extends StatelessWidget {
-  final bool isConnected;
-  const MessageField({super.key, required this.isConnected});
+class MessageField extends ConsumerWidget {
+  const MessageField({super.key});
+
+
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
-
+    final chatState = ref.watch(chatProvider);
     final textController = TextEditingController();
     final focusNode = FocusNode();
-    final outlineInputBorder = UnderlineInputBorder(
-        borderSide: const BorderSide(color: Colors.transparent),
-        borderRadius: BorderRadius.circular(40));
-    final chatProvider = context.read<ChatProvider>();
 
-    return TextFormField(
-      onTapOutside: (event) {
-        focusNode.unfocus();
-      },
-      focusNode: focusNode,
-      controller: textController,
-      onFieldSubmitted: (value) {
-        textController.clear();
-        focusNode.requestFocus();
-        chatProvider.sendMessage(value);
-      },
-      decoration: InputDecoration(
-          enabledBorder: outlineInputBorder,
-          focusedBorder: outlineInputBorder,
-          filled: true,
-          suffixIcon: IconButton(
-
-              color: colors.primary,
-              onPressed: isConnected
-                  ? () {
-                      final textValue = textController.value.text;
-                      textController.clear();
-                      chatProvider.sendMessage(textValue);
-                    }
-                  : null,
-              icon: const Icon(Icons.send))),
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: textController,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                hintText: 'Escribe aquí...',
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: colors.primary,
+                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(15.5)),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(113, 48, 48, 48),
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(15.5)),
+                ),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: chatState.isConnected
+                ? () {
+                    ref
+                        .read(chatProvider.notifier)
+                        .sendMessage(textController.text);
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(15),
+              backgroundColor: colors.primary,
+            ),
+            child: const Icon(Icons.send, color: Colors.white),
+          ),
+          ElevatedButton(
+            onPressed: chatState.isConnected
+                ? () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const QRScannerScreen()));
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(15),
+              backgroundColor: colors.primary,
+            ),
+            child: const Icon(Icons.camera_alt, color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 }
