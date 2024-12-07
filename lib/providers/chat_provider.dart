@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:chatbot/services/data_history_service.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class ChatState {
   final List<Message> messageList;
@@ -13,11 +14,12 @@ class ChatState {
   final bool isLoadingChat;
   final bool isWritingBot;
 
-  ChatState(
-      {this.messageList = const [],
-      this.isConnected = false,
-      this.isLoadingChat = true,
-      this.isWritingBot = false,});
+  ChatState({
+    this.messageList = const [],
+    this.isConnected = false,
+    this.isLoadingChat = true,
+    this.isWritingBot = false,
+  });
 
   ChatState copyWith({
     List<Message>? messageList,
@@ -37,13 +39,22 @@ class ChatNotifier extends StateNotifier<ChatState> {
   final ScrollController chatScrollController = ScrollController();
   late GenerativeModel chatModel;
   final List<Content> history = [];
+  final FlutterTts flutterTts = FlutterTts(); // Inicialización del TTS
 
   final DataHistoryService dataHistoryService = DataHistoryService();
 
   ChatNotifier() : super(ChatState()) {
     configureChatModel();
+    configureTts(); // Configurar TTS
     _startListeningToConnectivity();
     loadConversation();
+  }
+
+  void configureTts() {
+    flutterTts.setLanguage("en-US"); // Configurar idioma
+    flutterTts.setSpeechRate(0.5); // Velocidad de habla
+    flutterTts.setVolume(1.0); // Volumen
+    flutterTts.setPitch(1.0); // Tono
   }
 
   void configureChatModel() {
@@ -64,12 +75,18 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(isConnected: connected);
   }
 
-  Future<void> geminiMessage(text) async {
+  Future<void> geminiMessage(String text) async {
     final newMessageGemini = Message(text: text, fromWho: FromWho.gemini);
-    state = state.copyWith(
-        messageList: [...state.messageList, newMessageGemini]);
+    state =
+        state.copyWith(messageList: [...state.messageList, newMessageGemini]);
     moveScrollToBottom();
     await dataHistoryService.saveConversation(state.messageList);
+    await speakText(text); 
+  }
+
+  Future<void> speakText(String text) async {
+    await flutterTts.stop(); // Detener cualquier reproducción previa
+    await flutterTts.speak(text); // Hablar el texto
   }
 
   Future<void> sendMessage(String text) async {
@@ -120,19 +137,16 @@ class ChatNotifier extends StateNotifier<ChatState> {
     final chat = chatModel.startChat(history: history);
     var response = await chat.sendMessage(Content.text(text));
     history.add(Content.model([TextPart(response.text!)]));
-    await geminiMessage(response.text);
+    await geminiMessage(response.text!);
     state = state.copyWith(isWritingBot: false);
   }
 
-
-   Future<void> newConversation() async {
+  Future<void> newConversation() async {
     state = state.copyWith(messageList: [], isLoadingChat: true);
     history.clear();
     await dataHistoryService.clearConversation();
     state = state.copyWith(isLoadingChat: false);
   }
-
-
 }
 
 final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {

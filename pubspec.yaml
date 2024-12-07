@@ -45,6 +45,8 @@ dependencies:
   qr_flutter: ^4.1.0
   mobile_scanner: ^6.0.2
   fluttertoast: ^8.2.8
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.0
 
 dev_dependencies:
   flutter_test:

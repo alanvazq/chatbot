@@ -1,20 +1,48 @@
 import 'package:chatbot/providers/chat_provider.dart';
-import 'package:chatbot/screens/qr_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-class MessageField extends ConsumerWidget {
+class MessageField extends ConsumerStatefulWidget {
   const MessageField({super.key});
 
+  @override
+  ConsumerState<MessageField> createState() => _MessageFieldState();
+}
 
+class _MessageFieldState extends ConsumerState<MessageField> {
+  final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+  }
+
+  Future<void> _startListening() async {
+    bool available = await _speech.initialize();
+    if (available) {
+      setState(() => _isListening = true);
+      _speech.listen(onResult: (result) {
+        setState(() {
+          _textController.text = result.recognizedWords;
+        });
+      });
+    }
+  }
+
+  void _stopListening() {
+    setState(() => _isListening = false);
+    _speech.stop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final chatState = ref.watch(chatProvider);
-    final textController = TextEditingController();
-    final focusNode = FocusNode();
 
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -22,8 +50,8 @@ class MessageField extends ConsumerWidget {
         children: [
           Expanded(
             child: TextFormField(
-              controller: textController,
-              focusNode: focusNode,
+              controller: _textController,
+              focusNode: _focusNode,
               decoration: InputDecoration(
                 hintText: 'Escribe aquí...',
                 focusedBorder: OutlineInputBorder(
@@ -46,7 +74,8 @@ class MessageField extends ConsumerWidget {
                 ? () {
                     ref
                         .read(chatProvider.notifier)
-                        .sendMessage(textController.text);
+                        .sendMessage(_textController.text);
+                    _textController.clear();
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -57,20 +86,16 @@ class MessageField extends ConsumerWidget {
             child: const Icon(Icons.send, color: Colors.white),
           ),
           ElevatedButton(
-            onPressed: chatState.isConnected
-                ? () async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const QRScannerScreen()));
-                  }
-                : null,
+            onPressed: _isListening ? _stopListening : _startListening,
             style: ElevatedButton.styleFrom(
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(15),
-              backgroundColor: colors.primary,
+              backgroundColor: colors.secondary,
             ),
-            child: const Icon(Icons.camera_alt, color: Colors.white),
+            child: Icon(
+              _isListening ? Icons.mic_off : Icons.mic,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
